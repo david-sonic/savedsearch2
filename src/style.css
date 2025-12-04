@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: white;
+    overflow-x: hidden;
+}
+
+.mobile-container {
+    width: 100%;
+    max-width: 375px;
+    min-height: 100vh;
+    margin: 0 auto;
+    position: relative;
+    background: white;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 600px) {
+    .mobile-container {
+        width: 100vw;
+        max-width: none;
+    }
+}
+
+@media (min-width: 601px) {
+    .mobile-container {
+        width: 375px;
+        border: 2px solid #007bff;
+        box-shadow: 0 0 30px rgba(0,123,255,0.3);
+        margin: 20px auto;
+        border-radius: 20px;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+}
+
