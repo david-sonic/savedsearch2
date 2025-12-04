@@ -8,13 +8,13 @@
     <div class="hamburger-menu-panel" :class="{ 'open': isOpen }">
       <div class="hamburger-header">
         <img 
-          src="/Illustrations/05_Brand/logo-green-white.svg" 
+          src="/icons/logo-green-white.svg" 
           alt="EchoPark" 
           class="hamburger-logo" 
           @click="navigateToHomepage"
         >
         <img 
-          src="/Illustrations/Close_darkmode.svg" 
+          src="/icons/Close_darkmode.svg" 
           alt="Close" 
           class="hamburger-close" 
           @click="closeMenu"

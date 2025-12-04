@@ -5,14 +5,14 @@
       <div class="navigation-top">
         <div class="navigation-left">
           <img 
-            src="/Illustrations/07_SRP/hamburger-menu.svg" 
+            src="/icons/hamburger-menu.svg" 
             alt="Menu" 
             class="hamburger-icon" 
             @click="openHamburgerMenu"
           >
           <router-link to="/homepage">
             <img 
-              src="/Illustrations/05_Brand/logo-full-color.svg" 
+              src="/icons/logo-full-color.svg" 
               alt="EchoPark" 
               class="logo-icon"
             >
@@ -21,10 +21,10 @@
         <div class="navigation-right">
           <div class="location-info">
             <span class="location-text">75214</span>
-            <img src="/Illustrations/07_SRP/map-icon.svg" alt="Location" class="icon">
+            <img src="/icons/map-icon.svg" alt="Location" class="icon">
           </div>
-          <img src="/Illustrations/07_SRP/favorites.svg" alt="Favorites" class="icon">
-          <img src="/Illustrations/07_SRP/account.svg" alt="Account" class="icon">
+          <img src="/icons/favorites.svg" alt="Favorites" class="icon">
+          <img src="/icons/account.svg" alt="Account" class="icon">
         </div>
       </div>
       <div class="search-container" @click="navigateToSavedSearches">
@@ -36,7 +36,7 @@
         >
         <button class="search-btn">
           <img 
-            src="/Illustrations/Filter Bar Icons/Inputs/Button/Smalls/search-default.svg" 
+            src="/icons/search-default.svg" 
             alt="Search" 
             class="search-icon"
           >
@@ -47,12 +47,12 @@
     <!-- Filter Bar -->
     <div class="filter-bar">
       <div class="filter-section" @click="openFilterMenu">
-        <img src="/Illustrations/04_UI/filter.svg" alt="Filter" class="filter-icon">
+        <img src="/icons/Filter.svg" alt="Filter" class="filter-icon">
         <span class="filter-text">Filters</span>
       </div>
       <div class="filter-divider"></div>
       <div class="filter-section" @click="openSortMenu">
-        <img src="/Illustrations/04_UI/sort.svg" alt="Sort" class="filter-icon">
+        <img src="/icons/Sort-by.svg" alt="Sort" class="filter-icon">
         <span class="filter-text">Sort by</span>
       </div>
       <div class="filter-divider"></div>
@@ -76,7 +76,7 @@
         <div class="name-search-header">
           <button class="name-search-close" @click="closeNameSearch">
             <img 
-              src="/Illustrations/Toast icons/pop-up close icon.svg" 
+              src="/icons/pop-up-close-icon.svg" 
               alt="Close" 
               class="name-search-close-icon"
             >
@@ -103,7 +103,7 @@
           <button class="save-search-btn" @click="saveNamedSearch">Save</button>
           <a href="#" class="manage-alerts-link" @click.prevent="manageAlerts">
             <span>Manage alerts</span>
-            <img src="/Illustrations/right arrow.svg" alt="Arrow" class="arrow-icon">
+            <img src="/icons/right-arrow.svg" alt="Arrow" class="arrow-icon">
           </a>
         </div>
       </div>
@@ -114,7 +114,7 @@
       <div class="permanent-filter">
         <div class="location-pill">
           <img 
-            src="/Illustrations/Filter Bar Icons/location pill.svg" 
+            src="/icons/location-pill.svg" 
             alt="Location" 
             class="location-icon"
           >
@@ -134,7 +134,7 @@
         >
           <span class="filter-pill-text">{{ filter }}</span>
           <button class="filter-pill-close" @click="removeFilter(filter)">
-            <img src="/Illustrations/04_UI/x.svg" alt="Close" class="close-icon">
+            <img src="/icons/X.svg" alt="Close" class="close-icon">
           </button>
         </div>
       </div>
@@ -160,14 +160,14 @@
             :class="{ 'favorited': car.isFavorite }"
           >
             <img 
-              :src="car.isFavorite ? '/Illustrations/07_SRP/favorite.svg' : '/Illustrations/07_SRP/favorite.svg'" 
+              :src="car.isFavorite ? '/icons/favorite.svg' : '/icons/favorite.svg'" 
               alt="Favorite" 
               class="favorite-icon"
             >
           </button>
         </div>
         <div class="carousel-dots">
-          <img src="/Illustrations/07_SRP/carousel-dots.svg" alt="Carousel dots">
+          <img src="/icons/carousel-dots.svg" alt="Carousel dots">
         </div>
         <div class="tile-content">
           <div class="tile-details">
@@ -179,7 +179,7 @@
               <span class="tile-stock">Stock #: {{ car.stock }}</span>
               <div v-if="car.isNew && isViewingSavedSearch" class="srp-tile-new-badge">
                 <img 
-                  src="/Illustrations/02_Filter/saved-search-car-icon.svg" 
+                  src="/icons/saved-search-car-icon.svg" 
                   alt="New" 
                   class="srp-tile-new-badge-icon"
                 >
@@ -206,10 +206,10 @@
           </div>
           <div class="tile-actions">
             <button class="calculator-button">
-              <img src="/Illustrations/07_SRP/calculator.svg" alt="Calculator" class="calculator-icon">
+              <img src="/icons/calculator.svg" alt="Calculator" class="calculator-icon">
             </button>
             <button class="test-drive-button">
-              <img src="/Illustrations/07_SRP/test-drive.svg" alt="Test Drive" class="test-drive-icon">
+              <img src="/icons/test-drive.svg" alt="Test Drive" class="test-drive-icon">
               <span class="test-drive-text">Schedule test drive</span>
             </button>
           </div>
@@ -233,7 +233,7 @@
               @click="switchTab('filters')"
             >
               <img 
-                src="/Illustrations/filter menu icons/Filter menu icon.svg" 
+                src="/icons/Filter-menu-icon.svg" 
                 alt="Filter" 
                 class="filter-tab-icon"
               >
@@ -246,7 +246,7 @@
               @click="switchTab('searches')"
             >
               <img 
-                src="/Illustrations/filter menu icons/Saved searches filter menu.svg" 
+                src="/icons/Saved-searches-filter-menu.svg" 
                 alt="Saved" 
                 class="filter-tab-icon"
               >
@@ -256,7 +256,7 @@
           </div>
           <button class="filter-menu-close" @click="closeFilterMenu">
             <img 
-              src="/Illustrations/filter menu icons/Filter menu close.svg" 
+              src="/icons/Filter-menu-close.svg" 
               alt="Close" 
               class="filter-close-icon"
             >
@@ -268,7 +268,7 @@
           <div class="permanent-filter">
             <div class="location-pill">
               <img 
-                src="/Illustrations/Filter Bar Icons/location pill.svg" 
+                src="/icons/location-pill.svg" 
                 alt="Location" 
                 class="location-icon"
               >
@@ -288,7 +288,7 @@
             >
               <span class="filter-pill-text">{{ filter }}</span>
               <button class="filter-pill-close" @click="removeFilter(filter)">
-                <img src="/Illustrations/04_UI/x.svg" alt="Close" class="close-icon">
+                <img src="/icons/X.svg" alt="Close" class="close-icon">
               </button>
             </div>
           </div>
@@ -307,7 +307,7 @@
           >
             <span class="filter-option-text">{{ option }}</span>
             <img 
-              src="/Illustrations/filter menu icons/Parent filter icon.svg" 
+              src="/icons/Parent-filter-icon.svg" 
               alt="Arrow" 
               class="filter-arrow"
             >
@@ -328,7 +328,7 @@
           <div v-else-if="savedSearches.length === 0" class="my-searches-empty-state">
             <div class="empty-state-illustration">
               <img 
-                src="/Illustrations/09_Empty_States/no-saved-searches.svg" 
+                src="/icons/no-saved-searches.svg" 
                 alt="No saved searches" 
                 class="empty-state-icon"
               >
@@ -356,7 +356,7 @@
                   <div v-if="search.newResults" class="saved-search-status">
                     <div class="car-icon-container">
                       <img 
-                        src="/Illustrations/02_Filter/saved-search-car-icon.svg" 
+                        src="/icons/saved-search-car-icon.svg" 
                         alt="Car" 
                         class="car-icon"
                       >
@@ -367,7 +367,7 @@
               </div>
               <div class="manage-alerts-link">
                 <span>Manage alerts</span>
-                <img src="/Illustrations/right arrow.svg" alt="Arrow" class="arrow-icon">
+                <img src="/icons/right-arrow.svg" alt="Arrow" class="arrow-icon">
               </div>
             </div>
           </div>
@@ -393,7 +393,7 @@
         <div class="body-style-header">
           <div class="body-style-back" @click="closeBodyStyleFilter">
             <img 
-              src="/Illustrations/filter menu icons/distance&stores icons/Right Icon.svg" 
+              src="/icons/Right-Icon.svg" 
               alt="Back" 
               class="body-style-back-icon"
             >
@@ -447,7 +447,7 @@
         <div class="price-payment-header">
           <div class="price-payment-back" @click="closePriceFilter">
             <img 
-              src="/Illustrations/filter menu icons/distance&stores icons/Right Icon.svg" 
+              src="/icons/Right-Icon.svg" 
               alt="Back" 
               class="price-payment-back-icon"
             >
@@ -672,7 +672,7 @@ export default {
           price: 30499,
           store: 'SW Houston store',
           distance: 125,
-          image: '/Illustrations/07_SRP/srp-tile-car-image.png',
+          image: '/icons/srp-tile-car-image.png',
           isFavorite: false,
           added: '11/10/2025',
           isNew: true
@@ -685,7 +685,7 @@ export default {
           price: 28999,
           store: 'Dallas store',
           distance: 200,
-          image: '/Illustrations/07_SRP/srp-tile-car-image.png',
+          image: '/icons/srp-tile-car-image.png',
           isFavorite: false,
           added: '11/10/2025',
           isNew: true
@@ -698,7 +698,7 @@ export default {
           price: 34999,
           store: 'Austin store',
           distance: 150,
-          image: '/Illustrations/07_SRP/srp-tile-car-image.png',
+          image: '/icons/srp-tile-car-image.png',
           isFavorite: false,
           added: '11/9/2025',
         },
@@ -710,7 +710,7 @@ export default {
           price: 22999,
           store: 'Houston store',
           distance: 100,
-          image: '/Illustrations/07_SRP/srp-tile-car-image.png',
+          image: '/icons/srp-tile-car-image.png',
           isFavorite: false,
           added: '10/9/2025',
         }
@@ -728,22 +728,22 @@ export default {
         'Color'
       ],
       bodyStyles: [
-        { name: 'Convertible', count: 66, icon: '/Illustrations/Body style illustrations/Convertible.svg' },
-        { name: 'Coupe', count: 102, icon: '/Illustrations/Body style illustrations/Coupe.svg' },
-        { name: 'Hatchback', count: 87, icon: '/Illustrations/Body style illustrations/Hatchback.svg' },
-        { name: 'Sedan', count: 3102, icon: '/Illustrations/Body style illustrations/Sedan.svg' },
-        { name: 'SUV', count: 124, icon: '/Illustrations/Body style illustrations/SUV.svg' },
-        { name: 'Truck', count: 573, icon: '/Illustrations/Body style illustrations/Truck.svg' },
-        { name: 'Van/Minivan', count: 77, icon: '/Illustrations/Body style illustrations/Minivan.svg' },
-        { name: 'Wagon', count: 2, icon: '/Illustrations/Body style illustrations/Wagon.svg' }
+        { name: 'Convertible', count: 66, icon: '/icons/Convertible.svg' },
+        { name: 'Coupe', count: 102, icon: '/icons/Coupe.svg' },
+        { name: 'Hatchback', count: 87, icon: '/icons/Hatchback.svg' },
+        { name: 'Sedan', count: 3102, icon: '/icons/Sedan.svg' },
+        { name: 'SUV', count: 124, icon: '/icons/SUV.svg' },
+        { name: 'Truck', count: 573, icon: '/icons/Truck.svg' },
+        { name: 'Van/Minivan', count: 77, icon: '/icons/Minivan.svg' },
+        { name: 'Wagon', count: 2, icon: '/icons/Wagon.svg' }
       ]
     }
   },
   computed: {
     saveSearchIconSrc() {
       return (this.isSearchSaved || this.isViewingSavedSearch)
-        ? '/Illustrations/04_UI/search-saved.svg'
-        : '/Illustrations/04_UI/save-search.svg'
+        ? '/icons/Search-saved.svg'
+        : '/icons/Saved-search.svg'
     },
     saveSearchText() {
       if (this.isSearchSaved) {

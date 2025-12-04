@@ -3,13 +3,13 @@
     <div class="navigation-top">
       <div class="navigation-left">
         <img 
-          src="/Illustrations/07_SRP/hamburger-menu.svg" 
+          src="/icons/hamburger-menu.svg" 
           alt="Menu" 
           class="hamburger-icon" 
           @click="openHamburgerMenu"
         >
         <img 
-          src="/Illustrations/05_Brand/logo-white.svg" 
+          src="/icons/logo-white.svg" 
           alt="EchoPark" 
           class="logo-icon" 
           @click="navigateToHomepage"
@@ -18,10 +18,10 @@
       <div class="navigation-right">
         <div class="location-info">
           <span class="location-text">75214</span>
-          <img src="/Illustrations/07_SRP/map-icon.svg" alt="Location" class="icon">
+          <img src="/icons/map-icon.svg" alt="Location" class="icon">
         </div>
-        <img src="/Illustrations/07_SRP/favorites.svg" alt="Favorites" class="icon">
-        <img src="/Illustrations/07_SRP/account.svg" alt="Account" class="icon">
+        <img src="/icons/favorites.svg" alt="Favorites" class="icon">
+        <img src="/icons/account.svg" alt="Account" class="icon">
       </div>
     </div>
     <div class="search-container" @click="navigateToSavedSearches">
@@ -33,7 +33,7 @@
       >
       <button class="search-btn">
         <img 
-          src="/Illustrations/Filter Bar Icons/Inputs/Button/Smalls/search-default.svg" 
+          src="/icons/search-default.svg" 
           alt="Search" 
           class="search-icon"
         >

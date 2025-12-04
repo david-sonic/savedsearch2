@@ -13,7 +13,7 @@
         >
         <button class="search-clear" @click="clearSearch">
           <img 
-            src="/Illustrations/Toast icons/pop-up close icon.svg" 
+            src="/icons/pop-up-close-icon.svg" 
             alt="Clear" 
             class="search-clear-icon"
           >
@@ -48,7 +48,7 @@
           @click="selectSavedSearch(index)"
         >
           <img 
-            src="/Illustrations/02_Filter/saved-searches.svg" 
+            src="/icons/saved-searches.svg" 
             alt="Search" 
             class="saved-search-icon"
           >

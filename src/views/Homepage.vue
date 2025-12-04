@@ -7,7 +7,7 @@
       <div class="hero-image"></div>
       <div class="hero-overlay"></div>
       <img 
-        src="/Illustrations/05_Brand/logo-white.svg" 
+        src="/icons/logo-white.svg" 
         alt="EchoPark Logo" 
         class="hero-logo"
       >
@@ -41,7 +41,7 @@
         <div class="intro-card">
           <div class="card-illustration">
             <img 
-              src="/Illustrations/Homepage illustrations/Scene Illustration-1.svg" 
+              src="/icons/Scene-Illustration-1.svg" 
               alt="Vehicle Protection"
             >
           </div>
@@ -51,7 +51,7 @@
             <a href="#" class="card-link">
               Explore vehicle protection
               <img 
-                src="/Illustrations/01_Navigation/forward-arrow.svg" 
+                src="/icons/right-arrow.svg" 
                 alt="Arrow" 
                 class="arrow-icon"
               >
@@ -61,7 +61,7 @@
         <div class="intro-card">
           <div class="card-illustration">
             <img 
-              src="/Illustrations/Homepage illustrations/Scene Illustration-2.svg" 
+              src="/icons/Scene-Illustration-2.svg" 
               alt="Dream Cars"
             >
           </div>
@@ -71,7 +71,7 @@
             <a href="#" class="card-link">
               Shop cars
               <img 
-                src="/Illustrations/01_Navigation/forward-arrow.svg" 
+                src="/icons/right-arrow.svg" 
                 alt="Arrow" 
                 class="arrow-icon"
               >
@@ -81,7 +81,7 @@
         <div class="intro-card">
           <div class="card-illustration">
             <img 
-              src="/Illustrations/Homepage illustrations/Scene Illustration.svg" 
+              src="/icons/Scene-Illustration.svg" 
               alt="Happiness Guarantee"
             >
           </div>
@@ -91,7 +91,7 @@
             <a href="#" class="card-link">
               More about us
               <img 
-                src="/Illustrations/01_Navigation/forward-arrow.svg" 
+                src="/icons/right-arrow.svg" 
                 alt="Arrow" 
                 class="arrow-icon"
               >
@@ -159,7 +159,7 @@ export default {
   left: -16px;
   width: 488px;
   height: 364px;
-  background: url('/Illustrations/06_Homepage/vsc-takeover-hero-image-mb.svg') center/cover;
+  background: url('/img/vsc-takeover-hero-image-mb.svg') center/cover;
 }
 
 .hero-overlay {
