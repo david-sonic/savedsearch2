@@ -1452,7 +1452,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   padding: 0 8px;
   height: 100%;
   cursor: pointer;
@@ -1479,11 +1479,11 @@ export default {
 
 /* Name Search Overlay */
 .name-search-overlay {
-  position: fixed;
-  top: 158px;
-  left: 0;
-  right: 0;
+  position: absolute;
+  top: 0px;
+  left: 0px;
   width: 100%;
+  height: 100vh;
   z-index: 3500;
   display: flex;
   align-items: flex-start;
@@ -1498,6 +1498,7 @@ export default {
   padding: 24px 24px 16px;
   width: 100%;
   max-width: 375px;
+  margin-top: 180px;
   animation: slideDownModal 0.3s ease-out;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -1694,11 +1695,15 @@ export default {
   min-height: 36px;
 }
 
+.filter-pills-row .filter-pill {
+  padding-right: 0;
+}
+
 .filter-pill {
   background: #e6f1f5;
   border: 1px solid #006ea6;
   border-radius: 32px;
-  padding: 4px 12px;
+  padding: 4px 4px 4px 12px;
   display: flex;
   align-items: center;
   gap: 4px;
