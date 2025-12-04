@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   publicDir: 'public',
   base: process.env.NODE_ENV === 'production' 
-    ? '/saved-search-11-29-25/saved-search/' 
+    ? '/' 
     : '/',
   server: {
     port: 3000,
