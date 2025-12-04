@@ -1270,9 +1270,17 @@ export default {
     },
     closeBodyStyleFilter() {
       this.showBodyStyleFilter = false
+      // Reopen the main filter menu to go back to top level
+      setTimeout(() => {
+        this.isFilterMenuOpen = true
+      }, 100)
     },
     closePriceFilter() {
       this.showPriceFilter = false
+      // Reopen the main filter menu to go back to top level
+      setTimeout(() => {
+        this.isFilterMenuOpen = true
+      }, 100)
     },
     formatPrice(value) {
       return `$${parseInt(value).toLocaleString()}`
