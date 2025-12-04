@@ -970,8 +970,8 @@ export default {
         // User is viewing a saved search - clicking will unsave it
         this.unsaveSearch()
       } else if (this.isSearchSaved) {
-        // User has saved the current search - could show manage alerts
-        this.manageAlerts()
+        // User has saved the current search - clicking will unsave it
+        this.unsaveCurrentSearch()
       } else {
         // Show name search modal
         this.showNameSearch = true
@@ -1066,6 +1066,68 @@ export default {
         }
       }
     },
+    unsaveCurrentSearch() {
+      // Find and remove the saved search that matches the current filters
+      const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]')
+      
+      // Get current body styles from active filters
+      const bodyStyleNames = this.bodyStyles.map(s => s.name)
+      const currentBodyStyles = this.activeFilters.filter(f => bodyStyleNames.includes(f))
+      
+      // Get current price range from active filters
+      const priceFilter = this.activeFilters.find(f => f.startsWith('$') && f.includes('-'))
+      let currentPriceRange = null
+      if (priceFilter) {
+        const match = priceFilter.match(/\$([\d,]+)-\$([\d,]+)/)
+        if (match) {
+          currentPriceRange = {
+            min: match[1].replace(/,/g, ''),
+            max: match[2].replace(/,/g, '')
+          }
+        }
+      }
+      
+      // Find the matching saved search
+      const matchingIndex = savedSearches.findIndex(search => {
+        // Compare body styles
+        const searchBodyStyles = search.bodyStyles || []
+        const bodyStylesMatch = searchBodyStyles.length === currentBodyStyles.length &&
+          searchBodyStyles.every(style => currentBodyStyles.includes(style)) &&
+          currentBodyStyles.every(style => searchBodyStyles.includes(style))
+        
+        // Compare price range
+        let priceRangeMatch = true
+        if (currentPriceRange && search.priceRange) {
+          priceRangeMatch = search.priceRange.min === currentPriceRange.min &&
+                           search.priceRange.max === currentPriceRange.max
+        } else if (currentPriceRange || search.priceRange) {
+          priceRangeMatch = false
+        }
+        
+        return bodyStylesMatch && priceRangeMatch
+      })
+      
+      if (matchingIndex !== -1) {
+        // Remove the matching saved search
+        savedSearches.splice(matchingIndex, 1)
+        localStorage.setItem('savedSearches', JSON.stringify(savedSearches))
+        
+        // If the removed search was the selected one, reset selection
+        if (this.selectedSearchIndex === matchingIndex) {
+          this.selectedSearchIndex = null
+          this.isViewingSavedSearch = false
+        } else if (this.selectedSearchIndex !== null && this.selectedSearchIndex > matchingIndex) {
+          // Adjust selected index if a search before it was removed
+          this.selectedSearchIndex--
+        }
+        
+        // Force reactivity update to refresh the saved searches list
+        this.savedSearchesUpdateKey++
+        
+        // Reset the state
+        this.isSearchSaved = false
+      }
+    },
     loadFiltersFromSession() {
       // Load active filters from sessionStorage
       const savedFilters = sessionStorage.getItem('activeFilters')
@@ -1127,9 +1189,6 @@ export default {
       this.activeTab = tab
     },
     openFilterOption(option) {
-      // Close the filter menu first
-      this.isFilterMenuOpen = false
-      
       // Open the appropriate filter overlay
       if (option === 'Body style') {
         // Sync selected body styles with active filters
@@ -1160,6 +1219,11 @@ export default {
       } else {
         console.log('Filter option not yet implemented:', option)
       }
+      
+      // Close the main filter menu after 100ms delay
+      setTimeout(() => {
+        this.isFilterMenuOpen = false
+      }, 100)
     },
     selectSavedSearch(index) {
       // Only select the saved search visually, don't apply filters yet
@@ -1269,18 +1333,20 @@ export default {
       console.log('Open account creation')
     },
     closeBodyStyleFilter() {
-      this.showBodyStyleFilter = false
-      // Reopen the main filter menu to go back to top level
+      // Open the main filter menu first (behind the overlay)
+      this.isFilterMenuOpen = true
+      // Then close the sub-filter overlay after 10ms
       setTimeout(() => {
-        this.isFilterMenuOpen = true
-      }, 100)
+        this.showBodyStyleFilter = false
+      }, 10)
     },
     closePriceFilter() {
-      this.showPriceFilter = false
-      // Reopen the main filter menu to go back to top level
+      // Open the main filter menu first (behind the overlay)
+      this.isFilterMenuOpen = true
+      // Then close the sub-filter overlay after 10ms
       setTimeout(() => {
-        this.isFilterMenuOpen = true
-      }, 100)
+        this.showPriceFilter = false
+      }, 10)
     },
     formatPrice(value) {
       return `$${parseInt(value).toLocaleString()}`
@@ -1576,7 +1642,10 @@ export default {
       this.updatePriceFilterInActiveFilters()
       
       // Close the price filter overlay
-      this.closePriceFilter()
+      this.showPriceFilter = false
+      
+      // Close the entire filter menu
+      this.closeFilterMenu()
     },
     toggleBodyStyle(styleName) {
       const index = this.selectedBodyStyles.indexOf(styleName)
@@ -1611,7 +1680,11 @@ export default {
       }
       
       // Filters are automatically saved via watcher
-      this.closeBodyStyleFilter()
+      // Close the body style filter overlay
+      this.showBodyStyleFilter = false
+      
+      // Close the entire filter menu
+      this.closeFilterMenu()
     },
     formatSearchCriteria(search) {
       const parts = []
