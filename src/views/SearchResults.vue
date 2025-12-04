@@ -376,7 +376,7 @@
       
       <!-- Bottom Button -->
       <div class="filter-menu-bottom">
-        <button class="view-results-btn" @click="closeFilterMenu">
+        <button class="view-results-btn" @click="handleViewResults">
           <span class="view-results-text">View results</span>
         </button>
       </div>
@@ -509,22 +509,28 @@
                 :style="rangeBarStyle"
               ></div>
               <input 
+                ref="minPriceSlider"
                 type="range" 
                 class="range-slider range-slider-min" 
-                v-model.number="minPrice" 
+                :value="minPrice"
                 min="0" 
                 max="100000" 
                 step="1000"
-                @input="updateRangeBar"
+                @mousedown="preventMinSliderClick"
+                @touchstart="preventMinSliderClick"
+                @input="handleMinSliderInput"
               >
               <input 
+                ref="maxPriceSlider"
                 type="range" 
                 class="range-slider range-slider-max" 
-                v-model.number="maxPrice" 
+                :value="maxPrice"
                 min="0" 
                 max="100000" 
                 step="1000"
-                @input="updateRangeBar"
+                @mousedown="preventMaxSliderClick"
+                @touchstart="preventMaxSliderClick"
+                @input="handleMaxSliderInput"
               >
               <div 
                 class="range-slider-thumb range-slider-thumb-min" 
@@ -660,6 +666,10 @@ export default {
       savedSearchesUpdateKey: 0, // Used to force reactivity on saved searches list
       minPrice: 5000,
       maxPrice: 70000,
+      isDraggingMin: false,
+      isDraggingMax: false,
+      minPriceBeforeDrag: null,
+      maxPriceBeforeDrag: null,
       showSortMenu: false,
       selectedSortOption: 'price-lowest', // Default to price-lowest for homepage
       originalCarsOrder: [], // Store original order for distance-nearest
@@ -811,22 +821,17 @@ export default {
     
     if (isComingFromSavedSearch) {
       this.selectedSearchIndex = parseInt(selectedIndex)
-      this.isViewingSavedSearch = true
       sessionStorage.removeItem('selectedSavedSearchIndex')
-      
-      // Sort by added date (most recent to oldest) when coming from saved search
-      this.selectedSortOption = 'new-arrivals'
-      sessionStorage.setItem('sortBy', 'new-arrivals')
-      this.applySort('new-arrivals')
+      // Apply the saved search filters immediately when coming from SavedSearches page
+      this.applySelectedSavedSearch()
     } else {
       // Coming from homepage - always default to price (lowest to highest)
       this.selectedSortOption = 'price-lowest'
       sessionStorage.setItem('sortBy', 'price-lowest')
       this.applySort('price-lowest')
+      // Load filters from sessionStorage only if not coming from saved search
+      this.loadFiltersFromSession()
     }
-    
-    // Load filters from sessionStorage
-    this.loadFiltersFromSession()
   },
   watch: {
     activeFilters: {
@@ -859,6 +864,14 @@ export default {
     },
     closeFilterMenu() {
       this.isFilterMenuOpen = false
+    },
+    handleViewResults() {
+      // If a saved search is selected in the "My searches" tab, apply it first
+      if (this.activeTab === 'searches' && this.selectedSearchIndex !== null) {
+        this.applySelectedSavedSearch()
+      }
+      // Close the filter menu
+      this.closeFilterMenu()
     },
     openSortMenu() {
       this.showSortMenu = true
@@ -1149,12 +1162,19 @@ export default {
       }
     },
     selectSavedSearch(index) {
+      // Only select the saved search visually, don't apply filters yet
       this.selectedSearchIndex = index
+    },
+    applySelectedSavedSearch() {
+      // Apply the selected saved search filters
+      if (this.selectedSearchIndex === null) {
+        return
+      }
+      
       this.isViewingSavedSearch = true
-      // Apply saved search filters
       const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]')
-      if (savedSearches[index]) {
-        const savedSearch = savedSearches[index]
+      if (savedSearches[this.selectedSearchIndex]) {
+        const savedSearch = savedSearches[this.selectedSearchIndex]
         
         // Clear all non-persistent filter pills (keep only permanent location filter)
         // The permanent filter is the location (75214) which we want to keep
@@ -1233,13 +1253,10 @@ export default {
           }
         }
         
-        // Sort by added date (most recent to oldest) when selecting a saved search
+        // Sort by added date (most recent to oldest) when applying a saved search
         this.selectedSortOption = 'new-arrivals'
         sessionStorage.setItem('sortBy', 'new-arrivals')
         this.applySort('new-arrivals')
-        
-        // Close the filter menu after applying
-        this.closeFilterMenu()
       }
     },
     toggleFavorite(index) {
@@ -1263,37 +1280,277 @@ export default {
     updateMinPrice(event) {
       const value = event.target.value.replace(/[^0-9]/g, '')
       if (value) {
-        this.minPrice = Math.min(parseInt(value), this.maxPrice - 1000)
+        const newMinPrice = parseInt(value)
+        // Allow typing any value less than maxPrice, don't constrain during typing
+        if (newMinPrice < this.maxPrice) {
+          this.minPrice = newMinPrice
+          // Update filters immediately when price changes
+          this.updatePriceFilterInActiveFilters()
+        }
       }
     },
     updateMaxPrice(event) {
       const value = event.target.value.replace(/[^0-9]/g, '')
       if (value) {
-        this.maxPrice = Math.max(parseInt(value), this.minPrice + 1000)
+        const newMaxPrice = parseInt(value)
+        // Allow typing any value greater than minPrice, don't constrain during typing
+        if (newMaxPrice > this.minPrice) {
+          this.maxPrice = newMaxPrice
+          // Update filters immediately when price changes
+          this.updatePriceFilterInActiveFilters()
+        }
       }
     },
     formatMinPrice(event) {
       if (this.minPrice) {
+        // Enforce minimum gap constraint on blur
+        if (this.minPrice >= this.maxPrice - 1000) {
+          this.minPrice = Math.max(this.maxPrice - 1000, 0)
+        }
         event.target.value = this.formatPrice(this.minPrice)
+        this.updatePriceFilterInActiveFilters()
       }
     },
     formatMaxPrice(event) {
       if (this.maxPrice) {
+        // Enforce minimum gap constraint on blur
+        if (this.maxPrice <= this.minPrice + 1000) {
+          this.maxPrice = Math.min(this.minPrice + 1000, 100000)
+        }
         event.target.value = this.formatPrice(this.maxPrice)
+        this.updatePriceFilterInActiveFilters()
       }
     },
-    updateRangeBar() {
-      // Ensure min doesn't exceed max and vice versa
-      if (this.minPrice >= this.maxPrice) {
-        if (this.minPrice >= 100000) {
-          this.maxPrice = 100000
-          this.minPrice = 99000
-        } else {
-          this.maxPrice = this.minPrice + 1000
+    updateMinPriceSlider() {
+      // Don't adjust maxPrice at all - just update filters
+      // Update filters immediately when range changes
+      this.updatePriceFilterInActiveFilters()
+    },
+    preventMinSliderClick(event) {
+      // Prevent default to stop browser's native click-to-jump behavior
+      event.preventDefault()
+      event.stopPropagation()
+      
+      const slider = this.$refs.minPriceSlider
+      const maxSlider = this.$refs.maxPriceSlider
+      if (!slider) return false
+      
+      const rect = slider.getBoundingClientRect()
+      const clickX = event.clientX || (event.touches && event.touches[0].clientX)
+      const sliderWidth = rect.width
+      const minThumbPosition = (this.minPrice / 100000) * sliderWidth
+      const minThumbX = rect.left + minThumbPosition
+      const distanceFromMinThumb = Math.abs(clickX - minThumbX)
+      
+      // Also check distance from max thumb to see which one is closer
+      let distanceFromMaxThumb = Infinity
+      if (maxSlider) {
+        const maxThumbPosition = (this.maxPrice / 100000) * sliderWidth
+        const maxThumbX = rect.left + maxThumbPosition
+        distanceFromMaxThumb = Math.abs(clickX - maxThumbX)
+      }
+      
+      // If click is closer to max thumb, don't handle it here - but don't stop propagation
+      // so the max slider can handle it
+      if (distanceFromMaxThumb < distanceFromMinThumb) {
+        return false
+      }
+      
+      // If click is not on the min thumb (within 20px), completely prevent the interaction
+      if (distanceFromMinThumb > 20) {
+        event.stopImmediatePropagation()
+        return false
+      }
+      
+      // Click is on or near thumb, allow dragging but prevent default jump
+      this.minPriceBeforeDrag = this.minPrice
+      this.isDraggingMin = true
+      let hasMoved = false
+      const startX = clickX
+      const startY = event.clientY || (event.touches && event.touches[0].clientY)
+      
+      // Manually handle the drag
+      const handleMouseMove = (e) => {
+        const currentX = e.clientX || (e.touches && e.touches[0].clientX)
+        const currentY = e.clientY || (e.touches && e.touches[0].clientY)
+        // Check if mouse actually moved (at least 3px)
+        if (Math.abs(currentX - startX) > 3 || Math.abs(currentY - startY) > 3) {
+          hasMoved = true
+          // Calculate new value based on mouse position
+          const newX = currentX - rect.left
+          const percent = Math.max(0, Math.min(100, (newX / sliderWidth) * 100))
+          const newValue = Math.round((percent / 100) * 100000 / 1000) * 1000
+          // Constrain: minPrice cannot exceed (maxPrice - 1000) to maintain $1000 gap
+          const constrainedValue = Math.max(0, Math.min(this.maxPrice - 1000, newValue))
+          this.minPrice = constrainedValue
+          if (slider) {
+            slider.value = this.minPrice
+          }
+          this.updatePriceFilterInActiveFilters()
+        }
+      }
+      
+      const handleMouseUp = () => {
+        if (!hasMoved) {
+          // It was just a click, restore value
+          this.minPrice = this.minPriceBeforeDrag
+          if (slider) {
+            slider.value = this.minPriceBeforeDrag
+          }
+        }
+        this.isDraggingMin = false
+        this.minPriceBeforeDrag = null
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.removeEventListener('touchmove', handleMouseMove)
+        document.removeEventListener('touchend', handleMouseUp)
+      }
+      
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleMouseMove)
+      document.addEventListener('touchend', handleMouseUp)
+      
+      return false
+    },
+    preventMaxSliderClick(event) {
+      // Prevent default to stop browser's native click-to-jump behavior
+      event.preventDefault()
+      event.stopPropagation()
+      
+      const slider = this.$refs.maxPriceSlider
+      const minSlider = this.$refs.minPriceSlider
+      if (!slider) return false
+      
+      const rect = slider.getBoundingClientRect()
+      const clickX = event.clientX || (event.touches && event.touches[0].clientX)
+      const sliderWidth = rect.width
+      const maxThumbPosition = (this.maxPrice / 100000) * sliderWidth
+      const maxThumbX = rect.left + maxThumbPosition
+      const distanceFromMaxThumb = Math.abs(clickX - maxThumbX)
+      
+      // Also check distance from min thumb to see which one is closer
+      let distanceFromMinThumb = Infinity
+      if (minSlider) {
+        const minThumbPosition = (this.minPrice / 100000) * sliderWidth
+        const minThumbX = rect.left + minThumbPosition
+        distanceFromMinThumb = Math.abs(clickX - minThumbX)
+      }
+      
+      // Determine which slider to handle based on which thumb is closer
+      const isMinCloser = distanceFromMinThumb < distanceFromMaxThumb
+      const targetSlider = isMinCloser ? minSlider : slider
+      const targetDistance = isMinCloser ? distanceFromMinThumb : distanceFromMaxThumb
+      const isMinSlider = isMinCloser
+      
+      // If click is not on either thumb (within 20px), completely prevent the interaction
+      if (targetDistance > 20) {
+        event.stopImmediatePropagation()
+        return false
+      }
+      
+      // Use the appropriate slider and price value
+      const priceBeforeDrag = isMinSlider ? this.minPrice : this.maxPrice
+      const priceProperty = isMinSlider ? 'minPrice' : 'maxPrice'
+      const draggingProperty = isMinSlider ? 'isDraggingMin' : 'isDraggingMax'
+      const beforeDragProperty = isMinSlider ? 'minPriceBeforeDrag' : 'maxPriceBeforeDrag'
+      
+      // Click is on or near thumb, allow dragging but prevent default jump
+      this[beforeDragProperty] = priceBeforeDrag
+      this[draggingProperty] = true
+      let hasMoved = false
+      const startX = clickX
+      const startY = event.clientY || (event.touches && event.touches[0].clientY)
+      
+      // Manually handle the drag
+      const handleMouseMove = (e) => {
+        const currentX = e.clientX || (e.touches && e.touches[0].clientX)
+        const currentY = e.clientY || (e.touches && e.touches[0].clientY)
+        // Check if mouse actually moved (at least 3px)
+        if (Math.abs(currentX - startX) > 3 || Math.abs(currentY - startY) > 3) {
+          hasMoved = true
+          // Calculate new value based on mouse position
+          const newX = currentX - rect.left
+          const percent = Math.max(0, Math.min(100, (newX / sliderWidth) * 100))
+          const newValue = Math.round((percent / 100) * 100000 / 1000) * 1000
+          // Apply constraints based on which slider is being dragged
+          let constrainedValue
+          if (isMinSlider) {
+            // Min price cannot exceed (maxPrice - 1000) to maintain $1000 gap
+            constrainedValue = Math.max(0, Math.min(this.maxPrice - 1000, newValue))
+          } else {
+            // Max price cannot go below (minPrice + 1000) to maintain $1000 gap
+            constrainedValue = Math.max(this.minPrice + 1000, Math.min(100000, newValue))
+          }
+          this[priceProperty] = constrainedValue
+          if (targetSlider) {
+            targetSlider.value = this[priceProperty]
+          }
+          this.updatePriceFilterInActiveFilters()
+        }
+      }
+      
+      const handleMouseUp = () => {
+        if (!hasMoved) {
+          // It was just a click, restore value
+          this[priceProperty] = this[beforeDragProperty]
+          if (targetSlider) {
+            targetSlider.value = this[beforeDragProperty]
+          }
+        }
+        this[draggingProperty] = false
+        this[beforeDragProperty] = null
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.removeEventListener('touchmove', handleMouseMove)
+        document.removeEventListener('touchend', handleMouseUp)
+      }
+      
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleMouseMove)
+      document.addEventListener('touchend', handleMouseUp)
+      
+      return false
+    },
+    handleMinSliderInput(event) {
+      // Only update if we're actually dragging
+      if (this.isDraggingMin) {
+        this.minPrice = parseInt(event.target.value)
+        this.updatePriceFilterInActiveFilters()
+      } else {
+        // Not dragging, prevent the change by restoring value immediately
+        const currentValue = this.minPriceBeforeDrag !== null ? this.minPriceBeforeDrag : this.minPrice
+        event.target.value = currentValue
+        this.minPrice = currentValue
+        // Force immediate visual update
+        if (this.$refs.minPriceSlider) {
+          this.$refs.minPriceSlider.value = currentValue
         }
       }
     },
-    applyPriceFilter() {
+    handleMaxSliderInput(event) {
+      // Only update if we're actually dragging
+      if (this.isDraggingMax) {
+        this.maxPrice = parseInt(event.target.value)
+        this.updatePriceFilterInActiveFilters()
+      } else {
+        // Not dragging, prevent the change by restoring value immediately
+        const currentValue = this.maxPriceBeforeDrag !== null ? this.maxPriceBeforeDrag : this.maxPrice
+        event.target.value = currentValue
+        this.maxPrice = currentValue
+        // Force immediate visual update
+        if (this.$refs.maxPriceSlider) {
+          this.$refs.maxPriceSlider.value = currentValue
+        }
+      }
+    },
+    updateMaxPriceSlider() {
+      // Don't adjust minPrice at all - just update filters
+      // Update filters immediately when range changes
+      this.updatePriceFilterInActiveFilters()
+    },
+    updatePriceFilterInActiveFilters() {
       // Remove existing price filter if any
       this.activeFilters = this.activeFilters.filter(f => !f.startsWith('$') || !f.includes('-'))
       
@@ -1305,6 +1562,10 @@ export default {
       
       // Reset save search state
       this.resetSaveSearchState()
+    },
+    applyPriceFilter() {
+      // Update filters (in case they weren't already updated)
+      this.updatePriceFilterInActiveFilters()
       
       // Close the price filter overlay
       this.closePriceFilter()
@@ -2661,11 +2922,37 @@ export default {
 }
 
 .range-slider-min {
-  z-index: 1;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .range-slider-max {
-  z-index: 1;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.range-slider-min::-webkit-slider-thumb {
+  cursor: grab;
+}
+
+.range-slider-min::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.range-slider-min::-moz-range-thumb {
+  cursor: grab;
+}
+
+.range-slider-max::-webkit-slider-thumb {
+  cursor: grab;
+}
+
+.range-slider-max::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.range-slider-max::-moz-range-thumb {
+  cursor: grab;
 }
 
 .range-slider-thumb {
@@ -2746,7 +3033,7 @@ export default {
 
 .sort-menu-panel {
   position: absolute;
-  top: 50%;
+  top: calc(50% - 40px);
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(44, 44, 46, 0.95);
