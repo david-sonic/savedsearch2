@@ -974,14 +974,34 @@ export default {
         return
       }
       
-      // Save to localStorage
-      const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]')
-      savedSearches.push({
+      // Extract price range from active filters if it exists
+      const priceFilter = this.activeFilters.find(f => f.startsWith('$') && f.includes('-'))
+      let priceRange = null
+      if (priceFilter) {
+        const match = priceFilter.match(/\$([\d,]+)-\$([\d,]+)/)
+        if (match) {
+          priceRange = {
+            min: match[1].replace(/,/g, ''),
+            max: match[2].replace(/,/g, '')
+          }
+        }
+      }
+      
+      // Build saved search object
+      const savedSearch = {
         name: this.searchName,
         bodyStyles: this.activeFilters.filter(f => ['Sedan', 'SUV', 'Truck', 'Coupe', 'Hatchback', 'Convertible', 'Wagon', 'Minivan'].includes(f)),
-        priceRange: { min: '5000', max: '70000' },
         createdAt: new Date().toISOString()
-      })
+      }
+      
+      // Only add priceRange if it exists
+      if (priceRange) {
+        savedSearch.priceRange = priceRange
+      }
+      
+      // Save to localStorage
+      const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]')
+      savedSearches.push(savedSearch)
       localStorage.setItem('savedSearches', JSON.stringify(savedSearches))
       
       // Force reactivity update
