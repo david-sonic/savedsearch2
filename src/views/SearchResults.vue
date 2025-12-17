@@ -1226,8 +1226,9 @@ export default {
       }, 100)
     },
     selectSavedSearch(index) {
-      // Only select the saved search visually, don't apply filters yet
+      // Select the saved search and apply filters immediately
       this.selectedSearchIndex = index
+      this.applySelectedSavedSearch()
     },
     applySelectedSavedSearch() {
       // Apply the selected saved search filters
@@ -1263,6 +1264,9 @@ export default {
         if (savedSearch.priceRange) {
           const min = savedSearch.priceRange.min || '5000'
           const max = savedSearch.priceRange.max || '70000'
+          // Set minPrice and maxPrice values
+          this.minPrice = parseInt(min)
+          this.maxPrice = parseInt(max)
           const priceFilter = `$${parseInt(min).toLocaleString()}-$${parseInt(max).toLocaleString()}`
           if (!this.activeFilters.includes(priceFilter)) {
             this.activeFilters.push(priceFilter)
